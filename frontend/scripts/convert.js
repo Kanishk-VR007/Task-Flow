@@ -1,7 +1,8 @@
 const fs = require('fs');
+const path = require('path');
 
-const inputFile = 'd:\\TeamManger\\stitch_screens\\TaskFlow - Complete Cinematic Landing Page_2b2446738c7a423696ae41251630deaa.html';
-const outputFile = 'd:\\TeamManger\\frontend\\src\\components\\LandingPage.jsx';
+const inputFile = path.resolve(__dirname, '../../stitch_screens/TaskFlow - Complete Cinematic Landing Page_2b2446738c7a423696ae41251630deaa.html');
+const outputFile = path.resolve(__dirname, '../src/components/LandingPage.jsx');
 
 let html = fs.readFileSync(inputFile, 'utf8');
 

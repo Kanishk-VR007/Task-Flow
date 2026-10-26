@@ -60,6 +60,8 @@ Provides endpoints to manage higher-level goals:
 
 - **`backend/`**: Spring Boot application (Java, Maven, JPA, Security).
 - **`frontend/`**: React application (React, Tailwind CSS, Recharts).
+  - **`src/`**: React components, utilities, and application views.
+  - **`scripts/`**: Automation & test scripts (`convert.js`, `updateAnimations.js`, `test_intern_assignment.js`, `test_visibility.js`).
 
 ## Getting Started
 

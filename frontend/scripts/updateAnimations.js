@@ -1,6 +1,7 @@
 const fs = require('fs');
+const path = require('path');
 
-const file = 'd:\\TeamManger\\frontend\\src\\components\\LandingPage.jsx';
+const file = path.resolve(__dirname, '../src/components/LandingPage.jsx');
 let content = fs.readFileSync(file, 'utf8');
 
 // 1. Layer 1 Background
