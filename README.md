@@ -56,10 +56,31 @@ Provides endpoints to manage higher-level goals:
 - **Controllers**: Exposing RESTful API endpoints securely.
 - **DTOs**: Data Transfer Objects to maintain a clear separation of data across layers (`RegisterRequestDto`, `MessageRequestDto`, `TeamCreateRequest`).
 
+## Project Structure
+
+- **`backend/`**: Spring Boot application (Java, Maven, JPA, Security).
+- **`frontend/`**: React application (React, Tailwind CSS, Recharts).
+
 ## Getting Started
 
-1. Clone the repository.
-2. Ensure you have the `github.webhook.secret` configured in your `application.properties` or `application.yml` for webhook signature validation.
-3. Build the project using Maven or Gradle.
-4. Run the Spring Boot application.
-5. The application endpoints will be secured, ensure your database has the requisite initial Users and Roles setup to begin testing.
+### Backend Setup
+1. Open terminal in `backend/` (`cd backend`).
+2. Ensure you have the `github.webhook.secret` and database connection configured in `backend/src/main/resources/application.properties`.
+3. Build and run using the Maven wrapper:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   (On Windows: `.\mvnw.cmd spring-boot:run`)
+   The backend API will run on `http://localhost:9005` (or your configured port).
+
+### Frontend Setup
+1. Open terminal in `frontend/` (`cd frontend`).
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the React development server:
+   ```bash
+   npm start
+   ```
+   The UI will be accessible at `http://localhost:3000`.

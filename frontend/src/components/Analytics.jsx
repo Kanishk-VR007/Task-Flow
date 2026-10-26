@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../utils/api';
+import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const Analytics = () => {
+  // eslint-disable-next-line no-unused-vars
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => getUser() || null);
   const [loading, setLoading] = useState(true);
 
   // For interactive line chart
@@ -30,7 +32,7 @@ const Analytics = () => {
         });
       }
 
-      setProfile(me);
+      setProfile(me || getUser() || null);
       setStats(s);
       setUsers(filteredUsers);
       setTasks(filteredTasks);
@@ -235,8 +237,8 @@ const Analytics = () => {
                     
                     {/* User Identity */}
                     <div className="flex items-center gap-space-md min-w-[250px]">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-surface-container-highest to-surface-container-high border border-outline-variant/20 flex items-center justify-center font-bold text-lg text-on-surface shadow-inner relative group-hover:shadow-[0_0_15px_rgba(77,142,255,0.3)] transition-shadow">
-                        {(user.name || 'U').charAt(0)}
+                      <div className="relative group-hover:shadow-[0_0_15px_rgba(77,142,255,0.3)] transition-shadow rounded-full">
+                        <TaskFlowAvatar user={user} size="medium" />
                         {i < 3 && (
                           <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white shadow-md ${i===0 ? 'bg-amber-400' : i===1 ? 'bg-slate-300 text-slate-800' : 'bg-amber-700'}`}>
                             #{i+1}

@@ -8,8 +8,11 @@ import com.example.TeamManger.entity.Role;
 public class AuthResponse {
     private Long id;
     private String name;
+    private String email;
     private Role role;
     private String token;
+    private String avatarConfig;
+
     public Long getId() {
         return id;
     }
@@ -21,6 +24,12 @@ public class AuthResponse {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
     public Role getRole() {
         return role;
@@ -34,11 +43,19 @@ public class AuthResponse {
     public void setToken(String token) {
         this.token = token;
     }
-    public AuthResponse(Long id, String name, Role role, String token) {
+    public String getAvatarConfig() {
+        return avatarConfig;
+    }
+    public void setAvatarConfig(String avatarConfig) {
+        this.avatarConfig = avatarConfig;
+    }
+    public AuthResponse(Long id, String name, String email, Role role, String token, String avatarConfig) {
         this.id = id;
         this.name = name;
+        this.email = email;
         this.role = role;
         this.token = token;
+        this.avatarConfig = avatarConfig;
     }
     public AuthResponse() {
     }

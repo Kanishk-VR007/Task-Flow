@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Tilt from 'react-parallax-tilt';
 import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
+// eslint-disable-next-line no-unused-vars
 const statusColors = {
   COMPLETED: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: 'Completed' },
   IN_PROGRESS: { bg: 'bg-amber-500/10', text: 'text-amber-400', label: 'In Progress' },
@@ -10,10 +12,20 @@ const statusColors = {
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [tasks, setTasks] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const user = getUser() || {};
+  const [user, setUser] = useState(() => getUser() || {});
+
+  useEffect(() => {
+    const handleAvatarUpdate = () => {
+      const u = getUser();
+      if (u) setUser(u);
+    };
+    window.addEventListener('avatarUpdated', handleAvatarUpdate);
+    return () => window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -27,11 +39,12 @@ const Dashboard = () => {
       // Mock recent activities based on tasks
       const mockActivities = allTasks.slice(0, 5).map(task => ({
         id: task.id,
-        user: task.assignee || 'Unknown',
+        user: task.user?.name || task.assignee || 'Unknown',
+        fullUser: task.user,
         action: task.completionStatus === 'COMPLETED' ? 'completed' : 'updated',
         target: task.taskName,
         time: 'Just now',
-        avatar: (task.assignee || 'U')[0]
+        avatar: (task.user?.name || task.assignee || 'U')[0]
       }));
       setActivities(mockActivities);
 
@@ -198,8 +211,8 @@ const Dashboard = () => {
               activities.map((act, i) => (
                 <div key={i} className="flex gap-4 group">
                   <div className="relative flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/20 flex items-center justify-center font-bold text-on-surface z-10 group-hover:border-primary group-hover:text-primary transition-colors">
-                      {act.avatar}
+                    <div className="z-10 group-hover:scale-110 transition-transform">
+                      <TaskFlowAvatar user={act.fullUser || {name: act.user}} size="small" className="w-10 h-10" />
                     </div>
                     {i !== activities.length - 1 && (
                       <div className="w-px h-full bg-outline-variant/20 absolute top-10 group-hover:bg-primary/50 transition-colors"></div>

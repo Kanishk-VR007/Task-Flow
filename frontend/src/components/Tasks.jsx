@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
 const statusOptions = ['PENDING', 'IN_PROGRESS', 'REVIEW', 'COMPLETED', 'BLOCKED'];
 const filterOptions = ['ALL', 'PENDING', 'IN_PROGRESS', 'REVIEW', 'COMPLETED', 'OVERDUE', 'BLOCKED'];
@@ -193,16 +194,12 @@ const Tasks = () => {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] uppercase text-on-surface-variant/70 font-semibold tracking-wider">Assigned To</span>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary font-bold">
-                        {(task.user ? task.user.name || task.user.userName : 'U')[0].toUpperCase()}
-                      </div>
+                      <TaskFlowAvatar user={task.user || {name: 'Unassigned'}} size="small" className="w-6 h-6" />
                       <span className="text-xs font-semibold text-on-surface">{task.user ? task.user.name || task.user.userName : 'Unassigned'}</span>
                     </div>
                     {task.intern && (
                       <div className="flex items-center gap-1.5 mt-1">
-                        <div className="w-4 h-4 rounded-full bg-tertiary/20 flex items-center justify-center text-[8px] text-tertiary font-bold">
-                          {(task.intern.name || task.intern.userName || 'I')[0].toUpperCase()}
-                        </div>
+                        <TaskFlowAvatar user={task.intern || {name: 'I'}} size="small" className="w-5 h-5" />
                         <span className="text-[10px] font-semibold text-on-surface-variant">Intern: {task.intern.name || task.intern.userName}</span>
                       </div>
                     )}

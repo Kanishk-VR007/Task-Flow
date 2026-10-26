@@ -44,6 +44,7 @@ public class UserController {
             profile.put("effectiveWorkload", user.getEffectiveWorkload());
             profile.put("primaryDomain", user.getPrimaryDomain());
             profile.put("secondaryDomains", user.getSecondaryDomains());
+            profile.put("avatarConfig", user.getAvatarConfig());
             profile.put("teamId", user.getTeam() != null ? user.getTeam().getId() : null);
             profile.put("teamName", user.getTeam() != null ? user.getTeam().getTeamName() : null);
 
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'JUNIOR_DEV', 'INTERN')")
     public ResponseEntity<?> getAllUsers() {
         try {
             List<Users> users = userService.getAllUser();
@@ -69,6 +70,7 @@ public class UserController {
                 m.put("effectiveWorkload", u.getEffectiveWorkload());
                 m.put("primaryDomain", u.getPrimaryDomain());
                 m.put("secondaryDomains", u.getSecondaryDomains());
+                m.put("avatarConfig", u.getAvatarConfig());
                 m.put("teamId", u.getTeam() != null ? u.getTeam().getId() : null);
                 m.put("teamName", u.getTeam() != null ? u.getTeam().getTeamName() : null);
                 m.put("supervisorId", u.getSupervisor() != null ? u.getSupervisor().getId() : null);
@@ -158,7 +160,7 @@ public class UserController {
     private com.example.TeamManger.repository.TeamRepository teamRepository;
 
     @GetMapping("/teams")
-    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'DEVELOPER', 'JUNIOR_DEV', 'INTERN')")
     public ResponseEntity<?> getAllTeams() {
         try {
             return ResponseEntity.ok(teamRepository.findAll());
@@ -202,6 +204,23 @@ public class UserController {
             u.setCpassword(com.example.TeamManger.util.HashUtil.hashSHA256("password"));
             
             return ResponseEntity.ok(userRepository.save(u));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PutMapping("/me/avatar")
+    public ResponseEntity<?> updateAvatar(@RequestBody Map<String, String> body) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            Users user = userRepository.findByEmail(email);
+            if (user == null) user = userRepository.findByUserName(email);
+            if (user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            
+            if (body.containsKey("avatarConfig")) {
+                user.setAvatarConfig(body.get("avatarConfig"));
+                userRepository.save(user);
+            }
+            return ResponseEntity.ok("Avatar updated successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

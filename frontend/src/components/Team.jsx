@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../utils/api';
+import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
 const Team = () => {
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [teamsData, setTeamsData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => getUser() || null);
 
   // Drill Down State
   const [selectedTeam, setSelectedTeam] = useState(null); // String (team name)
@@ -36,7 +37,7 @@ const Team = () => {
       api.get('/api/users/teams').catch(() => [])
     ]).then(([u, me, t, tm]) => {
       setUsers(Array.isArray(u) ? u : []);
-      setProfile(me);
+      setProfile(me || getUser() || null);
       setTasks(Array.isArray(t) ? t : []);
       setTeamsData(Array.isArray(tm) ? tm : []);
       
@@ -232,9 +233,7 @@ const Team = () => {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-white font-bold text-xl shadow-[0_4px_12px_rgba(77,142,255,0.3)] group-hover:shadow-[0_0_20px_rgba(77,142,255,0.5)] transition-all">
-                      {(user.name || 'U').charAt(0).toUpperCase()}
-                    </div>
+                    <TaskFlowAvatar user={user} size="medium" />
                     <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-surface-container ${workload > 80 ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
                   </div>
                   <div>
@@ -340,9 +339,7 @@ const Team = () => {
           <div className="bg-surface-container-lowest h-full w-full max-w-2xl shadow-2xl border-l border-outline-variant/20 p-space-xl flex flex-col gap-space-lg overflow-y-auto animate-slide-in-right" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-outline-variant/10 pb-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                  {(selectedDeveloper.name || 'U').charAt(0).toUpperCase()}
-                </div>
+                <TaskFlowAvatar user={selectedDeveloper} size="large" className="w-16 h-16" />
                 <div>
                   <h2 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-3">
                     {selectedDeveloper.name} 
@@ -425,12 +422,12 @@ const Team = () => {
                   <p className="text-sm text-on-surface-variant">No interns assigned.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {selectedDeveloper.supervisedInterns.map(intern => (
+                    {selectedDeveloper.supervisedInterns.map(intern => {
+                      const fullIntern = users.find(u => u.id === intern.id) || intern;
+                      return (
                       <div key={intern.id} className="flex justify-between items-center bg-surface-container-low p-3 rounded-lg border border-outline-variant/10 group/intern hover:border-primary/30 transition-all anti-gravity-card">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-500/20 text-slate-400 flex items-center justify-center font-bold text-xs">
-                            {intern.name.charAt(0).toUpperCase()}
-                          </div>
+                          <TaskFlowAvatar user={fullIntern} size="small" />
                           <span className="font-semibold text-sm text-on-surface">{intern.name}</span>
                         </div>
                         {(isPM || profile?.role === 'TEAM_LEAD') && (
@@ -439,7 +436,7 @@ const Team = () => {
                           </button>
                         )}
                       </div>
-                    ))}
+                    )})}
                   </div>
                 )}
               </div>

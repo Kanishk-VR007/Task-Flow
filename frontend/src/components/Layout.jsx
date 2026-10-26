@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { api, getUser, logout } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
+import AvatarCustomizer from './AvatarCustomizer';
 
 const navItems = [
   { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -16,9 +18,10 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => getUser() || null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [customizerOpen, setCustomizerOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, title: 'Task Deadline Approaching', message: 'Backend Credential Security Improvement is due in 1 hour.', time: '10 mins ago', read: false, type: 'WARNING', taskId: 12 },
@@ -35,7 +38,18 @@ const Layout = ({ children }) => {
     api.get('/api/users/me').then(setProfile).catch(() => {});
   }, [navigate]);
 
+  useEffect(() => {
+    const handleAvatarUpdate = () => {
+      const u = getUser();
+      if (u) setProfile(u);
+      api.get('/api/users/me').then(setProfile).catch(() => {});
+    };
+    window.addEventListener('avatarUpdated', handleAvatarUpdate);
+    return () => window.removeEventListener('avatarUpdated', handleAvatarUpdate);
+  }, []);
+
   const user = profile || getUser() || {};
+  // eslint-disable-next-line no-unused-vars
   const initials = (user.name || 'U').charAt(0).toUpperCase();
   const roleName = (user.role || 'USER').replace('_', ' ');
 
@@ -83,7 +97,7 @@ const Layout = ({ children }) => {
         <div className="relative">
           <div className="bg-surface-container-low/70 rounded-xl p-space-sm flex items-center justify-between shadow-[0_4px_20px_-2px_rgba(2,6,23,0.5)] cursor-pointer hover:bg-surface-container transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
             <div className="flex items-center gap-space-sm min-w-0">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-white font-bold text-sm shadow-[0_2px_8px_rgba(77,142,255,0.3)]">{initials}</div>
+              <TaskFlowAvatar user={user} size="small" />
               {sidebarOpen && (
                 <div className="flex flex-col min-w-0">
                   <span className="font-body-sm text-on-surface truncate font-semibold leading-tight">{user.name || 'User'}</span>
@@ -103,6 +117,10 @@ const Layout = ({ children }) => {
                 <span className="material-symbols-outlined text-[18px]">person</span>
                 <span className="font-label-md">Profile</span>
               </Link>
+              <button onClick={() => { setCustomizerOpen(true); setMenuOpen(false); }} className="flex items-center gap-space-sm px-space-md py-space-sm hover:bg-surface-container transition-colors text-on-surface w-full text-left">
+                <span className="material-symbols-outlined text-[18px]">face</span>
+                <span className="font-label-md">Customize Avatar</span>
+              </button>
               <button onClick={logout} className="flex items-center gap-space-sm px-space-md py-space-sm hover:bg-error-container/30 transition-colors text-error w-full text-left">
                 <span className="material-symbols-outlined text-[18px]">logout</span>
                 <span className="font-label-md">Log Out</span>
@@ -171,10 +189,14 @@ const Layout = ({ children }) => {
         </header>
 
         {/* Main Content */}
-        <main className="relative pt-16 w-full px-space-xl py-space-xl min-h-screen z-10">
-          {children}
+        <main key={location.pathname} className="relative pt-16 w-full px-space-xl py-space-xl min-h-screen z-10">
+          {children || <Outlet />}
         </main>
       </div>
+      <AvatarCustomizer isOpen={customizerOpen} onClose={() => setCustomizerOpen(false)} onSave={() => {
+        window.dispatchEvent(new CustomEvent('avatarUpdated'));
+        api.get('/api/users/me').then(setProfile).catch(() => {});
+      }} />
     </div>
   );
 };

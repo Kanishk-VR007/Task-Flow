@@ -21,54 +21,17 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Protected Routes with Layout */}
-        <Route path="/dashboard" element={
-          <Layout>
-            <Dashboard />
-          </Layout>
-        } />
-        
-        <Route path="/tasks" element={
-          <Layout>
-            <Tasks />
-          </Layout>
-        } />
-
-        <Route path="/team" element={
-          <Layout>
-            <Team />
-          </Layout>
-        } />
-
-        <Route path="/analytics" element={
-          <Layout>
-            <Analytics />
-          </Layout>
-        } />
-
-        <Route path="/calendar" element={
-          <Layout>
-            <Calendar />
-          </Layout>
-        } />
-
-        <Route path="/profile" element={
-          <Layout>
-            <Profile />
-          </Layout>
-        } />
-
-        <Route path="/chat" element={
-          <Layout>
-            <Chat />
-          </Layout>
-        } />
-
-        <Route path="/reports" element={
-          <Layout>
-            <Reports />
-          </Layout>
-        } />
+        {/* Protected Routes with Layout using Outlet */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/reports" element={<Reports />} />
+        </Route>
       </Routes>
     </Router>
   );

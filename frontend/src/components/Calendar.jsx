@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../utils/api';
+import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DOMAINS = ['Frontend', 'Backend', 'Database', 'DevOps', 'Testing', 'Mobile', 'UI/UX', 'AI/ML', 'Cybersecurity'];
@@ -8,7 +9,8 @@ const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 
 const Calendar = () => {
   const [tasks, setTasks] = useState([]);
-  const [profile, setProfile] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [profile, setProfile] = useState(() => getUser() || null);
   
   // Date context
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -29,7 +31,7 @@ const Calendar = () => {
       api.get('/api/users/me').catch(() => null)
     ]).then(([tData, pData]) => {
       setTasks(Array.isArray(tData) ? tData : []);
-      setProfile(pData);
+      setProfile(pData || getUser() || null);
     });
   }, []);
 
@@ -236,9 +238,7 @@ const Calendar = () => {
                       </div>
                       <span className="text-xs font-semibold text-on-surface leading-tight line-clamp-2">{task.taskName}</span>
                       <div className="flex items-center gap-1 mt-1">
-                        <div className="w-4 h-4 rounded-full bg-surface-container-high flex items-center justify-center text-[8px] font-bold text-on-surface">
-                          {task.assignee ? task.assignee.charAt(0).toUpperCase() : (task.user?.name || 'U').charAt(0)}
-                        </div>
+                        <TaskFlowAvatar user={task.user || {name: task.assignee || 'Unassigned'}} size="small" className="w-4 h-4" />
                         <span className="text-[9px] text-on-surface-variant truncate flex-1">{task.assignee || task.user?.name || 'Unassigned'}</span>
                       </div>
                     </div>
@@ -277,9 +277,7 @@ const Calendar = () => {
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-on-surface-variant font-semibold tracking-wider">Assigned To</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-white text-[10px] font-bold">
-                      {(selectedTask.assignee || selectedTask.user?.name || 'U').charAt(0)}
-                    </div>
+                    <TaskFlowAvatar user={selectedTask.user || {name: selectedTask.assignee || 'Unassigned'}} size="small" className="w-6 h-6" />
                     <span className="text-sm font-semibold">{selectedTask.assignee || selectedTask.user?.name || 'Unassigned'}</span>
                   </div>
                 </div>

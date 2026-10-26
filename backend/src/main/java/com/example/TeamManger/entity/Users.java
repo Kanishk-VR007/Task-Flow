@@ -42,6 +42,9 @@ public class Users {
     private String primaryDomain; // e.g. BACKEND, FRONTEND
     private String secondaryDomains; // e.g. DEVOPS, DATABASE (comma separated)
 
+    @Column(columnDefinition = "TEXT")
+    private String avatarConfig;
+
     @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supervisor_id")
@@ -156,6 +159,8 @@ public class Users {
     public void setPrimaryDomain(String primaryDomain) { this.primaryDomain = primaryDomain; }
     public String getSecondaryDomains() { return secondaryDomains; }
     public void setSecondaryDomains(String secondaryDomains) { this.secondaryDomains = secondaryDomains; }
+    public String getAvatarConfig() { return avatarConfig; }
+    public void setAvatarConfig(String avatarConfig) { this.avatarConfig = avatarConfig; }
     public Users getSupervisor() { return supervisor; }
     public void setSupervisor(Users supervisor) { this.supervisor = supervisor; }
     public List<Users> getSupervisedInterns() { return supervisedInterns; }

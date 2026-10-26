@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { api } from '../utils/api';
+import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
 const Chat = () => {
   const [activeTab, setActiveTab] = useState('TEAM'); // 'TEAM', 'GLOBAL', or `TASK_${id}`
@@ -7,18 +8,19 @@ const Chat = () => {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getUser() || {});
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     api.get('/api/users/me').then(u => {
-      setUser(u);
-      if (['ADMIN', 'PROJECT_MANAGER'].includes(u.role)) {
+      setUser(u || getUser() || {});
+      if (['ADMIN', 'PROJECT_MANAGER'].includes((u || user).role)) {
         setActiveTab('GLOBAL');
       }
-      fetchMessages(u);
+      fetchMessages(u || user);
       fetchTasks();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTasks = () => {
@@ -30,9 +32,23 @@ const Chat = () => {
   const fetchMessages = (u = user) => {
     if (!u) return;
     setLoading(true);
-    let endpoint = `/api/chat/team/${u.teamId}`;
-    if (activeTab === 'GLOBAL') endpoint = '/api/chat/global-leads';
-    else if (activeTab.startsWith('TASK_')) endpoint = `/api/chat/task/${activeTab.split('_')[1]}`;
+    let targetTab = activeTab;
+    if (['ADMIN', 'PROJECT_MANAGER'].includes(u.role) && targetTab === 'TEAM') {
+      targetTab = 'GLOBAL';
+    }
+
+    let endpoint = null;
+    if (targetTab === 'GLOBAL') {
+      endpoint = '/api/chat/global-leads';
+    } else if (targetTab.startsWith('TASK_')) {
+      endpoint = `/api/chat/task/${targetTab.split('_')[1]}`;
+    } else if (u.teamId) {
+      endpoint = `/api/chat/team/${u.teamId}`;
+    } else {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
     
     api.get(endpoint).then(data => {
       setMessages(Array.isArray(data) ? data : []);
@@ -49,6 +65,7 @@ const Chat = () => {
     fetchMessages();
     const interval = setInterval(fetchMessages, 3000); 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, user]);
 
   const scrollToBottom = () => {
@@ -182,14 +199,17 @@ const Chat = () => {
                 const senderRole = msg.sender?.role || 'USER';
                 const isMe = msg.sender?.id === user.id || msg.sender?.email === user.email || senderName === user.name || senderName === user.email;
                 return (
-                  <div key={msg.id || i} className={`anti-gravity-card flex flex-col max-w-[80%] ${isMe ? 'self-end items-end' : 'self-start items-start'} transition-transform hover:-translate-y-1`}>
-                    <span className="text-xs text-on-surface-variant mb-1 flex items-center gap-2 px-1">
-                      <span className="font-semibold text-on-surface">{senderName}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 bg-surface-container-highest rounded font-bold tracking-wider">{senderRole.replace('_', ' ')}</span>
-                      <span className="opacity-70">{msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
-                    </span>
-                    <div className={`px-4 py-3 rounded-2xl ${isMe ? 'bg-primary text-on-primary rounded-tr-sm shadow-[0_4px_12px_rgba(77,142,255,0.3)]' : 'bg-surface-container-high text-on-surface rounded-tl-sm shadow-[0_4px_12px_rgba(0,0,0,0.1)]'} text-sm leading-relaxed backdrop-blur-md`}>
-                      {msg.content}
+                  <div key={msg.id || i} className={`anti-gravity-card flex gap-3 max-w-[80%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'} transition-transform hover:-translate-y-1`}>
+                    <TaskFlowAvatar user={msg.sender || {name: senderName}} size="small" className="w-8 h-8 mt-1 flex-shrink-0" />
+                    <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                      <span className="text-xs text-on-surface-variant mb-1 flex items-center gap-2 px-1">
+                        <span className="font-semibold text-on-surface">{senderName}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 bg-surface-container-highest rounded font-bold tracking-wider">{senderRole.replace('_', ' ')}</span>
+                        <span className="opacity-70">{msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                      </span>
+                      <div className={`px-4 py-3 rounded-2xl ${isMe ? 'bg-primary text-on-primary rounded-tr-sm shadow-[0_4px_12px_rgba(77,142,255,0.3)]' : 'bg-surface-container-high text-on-surface rounded-tl-sm shadow-[0_4px_12px_rgba(0,0,0,0.1)]'} text-sm leading-relaxed backdrop-blur-md`}>
+                        {msg.content}
+                      </div>
                     </div>
                   </div>
                 );
@@ -200,7 +220,7 @@ const Chat = () => {
 
           {/* Input Area */}
           <div className="p-space-md border-t border-outline-variant/10 bg-surface-container/50">
-            {activeTab.startsWith('TASK_') && tasks.find(t => t.id == activeTab.split('_')[1])?.completionStatus === 'COMPLETED' ? (
+            {activeTab.startsWith('TASK_') && tasks.find(t => t.id === Number(activeTab.split('_')[1]))?.completionStatus === 'COMPLETED' ? (
               <div className="flex items-center justify-center p-3 text-sm text-on-surface-variant bg-surface-container-low rounded-xl border border-outline-variant/20 italic shadow-inner">
                 <span className="material-symbols-outlined text-[18px] mr-2">lock</span>
                 This task is completed. The collaboration chat is archived.

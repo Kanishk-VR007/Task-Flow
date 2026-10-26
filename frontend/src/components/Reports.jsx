@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../utils/api';
+import { api, getUser } from '../utils/api';
+import TaskFlowAvatar from './TaskFlowAvatar';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => getUser() || {});
   const [loading, setLoading] = useState(true);
 
   // Modal State
@@ -21,7 +22,7 @@ const Reports = () => {
       api.get('/api/reports/all').catch(() => []),
       api.get('/tasks/GetallData').catch(() => [])
     ]).then(([uData, rData, tData]) => {
-      setUser(uData);
+      setUser(uData || getUser() || {});
       setReports(Array.isArray(rData) ? rData : []);
       setTasks(Array.isArray(tData) ? tData : []);
       setLoading(false);
@@ -116,9 +117,7 @@ const Reports = () => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
-                      {report.developer?.name?.charAt(0) || 'D'}
-                    </div>
+                    <TaskFlowAvatar user={report.developer || {name: 'Unknown'}} size="small" className="w-6 h-6" />
                     <span className="font-medium text-on-surface">{report.developer?.name || 'Unknown'}</span>
                   </div>
                 </td>

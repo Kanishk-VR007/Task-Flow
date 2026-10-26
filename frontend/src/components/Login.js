@@ -5,20 +5,25 @@ import { auth, googleProvider, githubProvider } from '../utils/firebase';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleOAuthLogin = async (providerName) => {
     try {
+      setError('');
       const provider = providerName === 'google' ? googleProvider : githubProvider;
       const result = await signInWithPopup(auth, provider);
       
-      const email = result.user.email;
-      const name = result.user.displayName || email.split('@')[0];
+      const oauthEmail = result.user.email;
+      const name = result.user.displayName || oauthEmail.split('@')[0];
       
       const response = await fetch('http://localhost:9005/auth/oauth-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name, provider: providerName })
+        body: JSON.stringify({ email: oauthEmail, name, provider: providerName })
       });
       
       if (response.ok) {
@@ -28,27 +33,39 @@ const Login = () => {
         navigate('/dashboard');
       } else {
         const text = await response.text();
-        alert(`${providerName} login failed: ` + text);
+        setError(`${providerName} login failed: ` + text);
       }
-    } catch (error) {
-      if (error.code === 'auth/invalid-api-key') {
-        alert("Please configure your Firebase API keys in src/utils/firebase.js to use real Google/GitHub authentication!");
-      } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-        alert('Authentication Error: ' + error.message);
+    } catch (err) {
+      if (err.code === 'auth/invalid-api-key') {
+        setError("Please configure your Firebase API keys in src/utils/firebase.js to use real Google/GitHub authentication!");
+      } else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        setError('Authentication Error: ' + err.message);
       }
     }
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+  const handleLogin = async (e, customEmail, customPass) => {
+    if (e) e.preventDefault();
+    const loginUser = (customEmail !== undefined ? customEmail : email).trim();
+    const loginPass = customPass !== undefined ? customPass : password;
+
+    if (!loginUser) {
+      setError('Please enter your email or username');
+      return;
+    }
+    if (!loginPass) {
+      setError('Please enter your password');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
 
     try {
       const response = await fetch('http://localhost:9005/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: loginUser, password: loginPass })
       });
 
       if (response.ok) {
@@ -58,11 +75,19 @@ const Login = () => {
         navigate('/dashboard');
       } else {
         const text = await response.text();
-        alert('Login failed: ' + text);
+        setError(text || 'Login failed. Please check your credentials.');
       }
-    } catch (error) {
-      alert('Error: ' + error.message);
+    } catch (err) {
+      setError('Connection error: ' + (err.message || 'Could not connect to authentication server. Please ensure backend is running.'));
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const fillAndLogin = (uEmail, uPass) => {
+    setEmail(uEmail);
+    setPassword(uPass);
+    handleLogin(null, uEmail, uPass);
   };
 
 
@@ -465,17 +490,72 @@ const Login = () => {
             or continue with enterprise email
           </span>
 </div>
+{/*  Error Alert Banner  */}
+{error && (
+  <div className="mb-4 p-3 rounded-xl bg-error-container/20 border border-error/30 text-error flex items-start gap-2.5 animate-shake">
+    <span className="material-symbols-outlined text-[20px] shrink-0 text-error">error</span>
+    <span className="text-xs leading-relaxed">{error}</span>
+  </div>
+)}
+
+{/*  Quick Demo Accounts Helper  */}
+<div className="mb-space-md p-3 rounded-xl bg-surface-container-high/60 border border-primary/20 flex flex-col gap-2">
+  <div className="flex items-center justify-between">
+    <span className="text-[11px] font-bold text-primary flex items-center gap-1 font-mono uppercase tracking-wide">
+      <span className="material-symbols-outlined text-[14px]">bolt</span> Quick Demo Accounts
+    </span>
+    <span className="text-[10px] text-on-surface-variant font-mono">Password: password</span>
+  </div>
+  <div className="grid grid-cols-3 gap-1.5">
+    <button 
+      type="button" 
+      onClick={() => fillAndLogin('rahul@taskflow.com', 'password')}
+      className="p-1.5 rounded-lg bg-surface-container hover:bg-primary-container/20 hover:text-primary border border-outline-variant/10 text-center transition-all cursor-pointer text-xs"
+      title="Login as Developer"
+    >
+      <div className="font-semibold truncate">Rahul</div>
+      <div className="text-[9px] text-on-surface-variant truncate">Developer</div>
+    </button>
+    <button 
+      type="button" 
+      onClick={() => fillAndLogin('arun@taskflow.com', 'password')}
+      className="p-1.5 rounded-lg bg-surface-container hover:bg-primary-container/20 hover:text-primary border border-outline-variant/10 text-center transition-all cursor-pointer text-xs"
+      title="Login as Team Lead"
+    >
+      <div className="font-semibold truncate">Arun</div>
+      <div className="text-[9px] text-on-surface-variant truncate">Team Lead</div>
+    </button>
+    <button 
+      type="button" 
+      onClick={() => fillAndLogin('priya@taskflow.com', 'password')}
+      className="p-1.5 rounded-lg bg-surface-container hover:bg-primary-container/20 hover:text-primary border border-outline-variant/10 text-center transition-all cursor-pointer text-xs"
+      title="Login as Project Manager"
+    >
+      <div className="font-semibold truncate">Priya</div>
+      <div className="text-[9px] text-on-surface-variant truncate">Manager</div>
+    </button>
+  </div>
+</div>
+
 {/*  Form Elements  */}
 <form className="flex flex-col gap-space-lg" onSubmit={handleLogin}>
-{/*  Work Email  */}
+{/*  Work Email or Username  */}
 <div className="flex flex-col gap-space-xs group">
 <label className="font-label-md text-label-md text-on-surface font-medium flex items-center justify-between transition-colors group-focus-within:text-primary" htmlFor="email">
-<span>Work Email</span>
-<span className="font-label-sm text-label-sm text-on-surface-variant font-normal">SSO enabled</span>
+<span>Email or Username</span>
+<span className="font-label-sm text-label-sm text-on-surface-variant font-normal">e.g. rahul or rahul@taskflow.com</span>
 </label>
 <div className="relative flex items-center">
-<span className="material-symbols-outlined absolute left-space-md text-on-surface-variant text-[18px] pointer-events-none transition-colors group-focus-within:text-primary">mail</span>
-<input className="w-full h-11 pl-10 pr-space-md rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md border border-transparent focus:border-primary/50 focus:outline-none focus:bg-surface-container-low focus:shadow-[0_0_16px_rgba(77,142,255,0.15)] shadow-sm transition-all" id="email" placeholder="alex@company.com" required="" type="email"/>
+<span className="material-symbols-outlined absolute left-space-md text-on-surface-variant text-[18px] pointer-events-none transition-colors group-focus-within:text-primary">person</span>
+<input 
+  className="w-full h-11 pl-10 pr-space-md rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md border border-transparent focus:border-primary/50 focus:outline-none focus:bg-surface-container-low focus:shadow-[0_0_16px_rgba(77,142,255,0.15)] shadow-sm transition-all" 
+  id="email" 
+  value={email}
+  onChange={e => setEmail(e.target.value)}
+  placeholder="rahul@taskflow.com or rahul" 
+  required
+  type="text"
+/>
 </div>
 </div>
 {/*  Password  */}
@@ -486,7 +566,15 @@ const Login = () => {
 </div>
 <div className="relative flex items-center">
 <span className="material-symbols-outlined absolute left-space-md text-on-surface-variant text-[18px] pointer-events-none transition-colors group-focus-within:text-primary">lock</span>
-<input className="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md border border-transparent focus:border-primary/50 focus:outline-none focus:bg-surface-container-low focus:shadow-[0_0_16px_rgba(77,142,255,0.15)] shadow-sm transition-all" id="password" placeholder="••••••••••••" required="" type={showPassword ? "text" : "password"}/>
+<input 
+  className="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md border border-transparent focus:border-primary/50 focus:outline-none focus:bg-surface-container-low focus:shadow-[0_0_16px_rgba(77,142,255,0.15)] shadow-sm transition-all" 
+  id="password" 
+  value={password}
+  onChange={e => setPassword(e.target.value)}
+  placeholder="••••••••••••" 
+  required
+  type={showPassword ? "text" : "password"}
+/>
 <button className="absolute right-space-md text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center p-1 rounded hover:bg-surface-container" id="toggle-pwd" onClick={() => setShowPassword(!showPassword)} type="button">
 <span className="material-symbols-outlined text-[18px]">{showPassword ? "visibility_off" : "visibility"}</span>
 </button>
@@ -500,8 +588,12 @@ const Login = () => {
             </label>
 </div>
 {/*  Submit Button  */}
-<button className="group w-full h-12 rounded-lg bg-primary-container hover:bg-inverse-primary text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-space-sm shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 mt-space-xs" type="submit">
-<span>Sign In to TaskFlow</span>
+<button 
+  disabled={loading}
+  className="group w-full h-12 rounded-lg bg-primary-container hover:bg-inverse-primary text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-space-sm shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 mt-space-xs disabled:opacity-60 cursor-pointer" 
+  type="submit"
+>
+<span>{loading ? 'Authenticating...' : 'Sign In to TaskFlow'}</span>
 <span className="material-symbols-outlined text-[20px] transition-transform duration-200 group-hover:translate-x-1">arrow_forward</span>
 </button>
 </form>

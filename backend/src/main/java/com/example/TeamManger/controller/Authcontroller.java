@@ -14,9 +14,11 @@ import com.example.TeamManger.dto.AuthRequest;
 import com.example.TeamManger.dto.AuthResponse;
 import com.example.TeamManger.dto.RegisterRequestDto;
 import com.example.TeamManger.entity.Users;
+import com.example.TeamManger.repository.Userrepository;
 import com.example.TeamManger.security.Jwtutil;
 import com.example.TeamManger.service.UserService;
 import com.example.TeamManger.util.HashUtil;
+import java.util.List;
 
 @RequestMapping("/auth")
 @RestController
@@ -24,6 +26,9 @@ import com.example.TeamManger.util.HashUtil;
 public class Authcontroller {
     @Autowired
     org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    Userrepository userRepository;
 
     @Autowired
     UserService obj;
@@ -81,26 +86,57 @@ public class Authcontroller {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest data) {
-        // validation
         try {
-            Users user = obj.getinfoByEmail(data.getEmail());
+            if (data == null || data.getEmail() == null || data.getEmail().trim().isEmpty()) {
+                return new ResponseEntity<>("Please enter your email or username", HttpStatus.BAD_REQUEST);
+            }
+            if (data.getPassword() == null || data.getPassword().isEmpty()) {
+                return new ResponseEntity<>("Please enter your password", HttpStatus.BAD_REQUEST);
+            }
+
+            String input = data.getEmail().trim();
+            Users user = obj.getinfoByEmail(input);
             if (user == null) {
-                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
+                user = userRepository.findByUserName(input);
             }
+            if (user == null && !input.contains("@")) {
+                user = obj.getinfoByEmail(input + "@taskflow.com");
+            }
+            if (user == null) {
+                // Try case-insensitive scan
+                List<Users> all = userRepository.findAll();
+                for (Users u : all) {
+                    if (u.getEmail() != null && u.getEmail().equalsIgnoreCase(input)) {
+                        user = u;
+                        break;
+                    }
+                    if (u.getUserName() != null && u.getUserName().equalsIgnoreCase(input)) {
+                        user = u;
+                        break;
+                    }
+                }
+            }
+
+            if (user == null) {
+                return new ResponseEntity<>("User not found. Try your TaskFlow email (e.g. rahul@taskflow.com) or username (e.g. rahul)", HttpStatus.BAD_REQUEST);
+            }
+
             if (!user.getFpassword().equals(HashUtil.hashSHA256(data.getPassword()))) {
-                return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>("Invalid password. Default demo password is 'password'", HttpStatus.UNAUTHORIZED);
             }
+
             AuthResponse userdata = new AuthResponse();
             userdata.setName(user.getUserName());
+            userdata.setEmail(user.getEmail());
             userdata.setRole(user.getRole());
             userdata.setId(user.getId());
+            userdata.setAvatarConfig(user.getAvatarConfig());
             userdata.setToken(obj2.gen_token(user.getEmail(), user.getRole()));
             return new ResponseEntity<>(userdata, HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>("Enter a Valid Credential", HttpStatus.BAD_REQUEST);
+            System.out.println("Login error: " + e.getMessage());
+            return new ResponseEntity<>("Login failed: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @PostMapping("/oauth-login")
@@ -129,8 +165,10 @@ public class Authcontroller {
 
             AuthResponse userdata = new AuthResponse();
             userdata.setName(user.getUserName());
+            userdata.setEmail(user.getEmail());
             userdata.setRole(user.getRole());
             userdata.setId(user.getId());
+            userdata.setAvatarConfig(user.getAvatarConfig());
             userdata.setToken(obj2.gen_token(user.getEmail(), user.getRole()));
             return new ResponseEntity<>(userdata, HttpStatus.OK);
         } catch (Exception e) {
