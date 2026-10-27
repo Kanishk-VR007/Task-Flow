@@ -58,9 +58,29 @@ public class Users {
     private Integer supportWorkload = 0;
     private Integer codeReviewWorkload = 0;
     
+    @Column(name = "is_default_password")
+    private Boolean isDefaultPassword = false;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_pm_id")
+    private Users companyPm;
+
     @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Task> task;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToMany(mappedBy = "company")
+    private List<Task> companyTasks;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToMany(mappedBy = "company")
+    private List<CommunicationLog> companyCommunications;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToMany(mappedBy = "company")
+    private List<TaskReport> companyReports;
 
     public Long getId() {
         return id;
@@ -171,6 +191,12 @@ public class Users {
     public void setSupportWorkload(Integer supportWorkload) { this.supportWorkload = supportWorkload; }
     public Integer getCodeReviewWorkload() { return codeReviewWorkload; }
     public void setCodeReviewWorkload(Integer codeReviewWorkload) { this.codeReviewWorkload = codeReviewWorkload; }
+    public Boolean getIsDefaultPassword() { return isDefaultPassword != null ? isDefaultPassword : false; }
+    public void setIsDefaultPassword(Boolean isDefaultPassword) { this.isDefaultPassword = isDefaultPassword; }
+    public Users getCompanyPm() { return companyPm; }
+    public void setCompanyPm(Users companyPm) { this.companyPm = companyPm; }
+    public List<Task> getCompanyTasks() { return companyTasks; }
+    public void setCompanyTasks(List<Task> companyTasks) { this.companyTasks = companyTasks; }
 
     @com.fasterxml.jackson.annotation.JsonIgnore
     public Integer getEffectiveWorkload() {
@@ -208,6 +234,22 @@ public class Users {
         List<Task> active = task.stream().filter(t -> !"COMPLETED".equalsIgnoreCase(t.getCompletionStatus())).toList();
         if (active.isEmpty()) return 0;
         return (int) active.stream().mapToInt(t -> t.getProgress() != null ? t.getProgress() : 0).average().orElse(0.0);
+    }
+
+    public List<CommunicationLog> getCompanyCommunications() {
+        return companyCommunications;
+    }
+
+    public void setCompanyCommunications(List<CommunicationLog> companyCommunications) {
+        this.companyCommunications = companyCommunications;
+    }
+
+    public List<TaskReport> getCompanyReports() {
+        return companyReports;
+    }
+
+    public void setCompanyReports(List<TaskReport> companyReports) {
+        this.companyReports = companyReports;
     }
 
     public Users(Long id, String userName, String email, Role role, String fpassword, String cpassword,

@@ -115,7 +115,7 @@ const Dashboard = () => {
             <div key={i} className="rounded-xl bg-surface-container/50 p-space-lg animate-pulse h-32"></div>
           ))
         ) : kpis.map((kpi, i) => (
-          <div key={i} className="anti-gravity-card group relative rounded-xl bg-surface-container/60 p-space-lg backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.1)] transition-all duration-300 border border-outline-variant/10 overflow-hidden">
+          <div key={i} className="taskflow-card group relative rounded-xl bg-surface-container/60 p-space-lg backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.1)] transition-all duration-300 border border-outline-variant/10 overflow-hidden">
             <div className={`absolute -right-12 -top-12 w-32 h-32 bg-${kpi.color}/10 rounded-full blur-2xl group-hover:bg-${kpi.color}/20 transition-all duration-500 pointer-events-none`}></div>
             
             <div className="flex items-center justify-between mb-4 relative z-10">
@@ -148,7 +148,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
         {/* Project Overview */}
         <div className="lg:col-span-2 flex flex-col gap-space-lg">
-          <div className="anti-gravity-card rounded-xl bg-surface-container/60 p-space-xl backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-outline-variant/10">
+          <div className="taskflow-card rounded-xl bg-surface-container/60 p-space-xl backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-outline-variant/10">
             <h2 className="font-headline-sm text-headline-sm text-on-surface mb-6">Project Overview</h2>
             
             <div className="flex flex-col gap-6">
@@ -201,7 +201,7 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Activities */}
-        <div className="anti-gravity-card rounded-xl bg-surface-container/60 p-space-xl backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-outline-variant/10 flex flex-col">
+        <div className="taskflow-card rounded-xl bg-surface-container/60 p-space-xl backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.08)] border border-outline-variant/10 flex flex-col">
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-6">Recent Activities</h2>
           
           <div className="flex flex-col gap-4 flex-1">

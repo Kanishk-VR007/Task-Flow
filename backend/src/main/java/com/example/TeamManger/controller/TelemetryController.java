@@ -2,7 +2,7 @@ package com.example.TeamManger.controller;
 
 import com.example.TeamManger.entity.WebhookEvent;
 import com.example.TeamManger.repository.WebhookEventRepository;
-import com.example.TeamManger.service.AntiGravityService;
+import com.example.TeamManger.service.WorkloadTelemetryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ public class TelemetryController {
     private WebhookEventRepository webhookEventRepository;
 
     @Autowired
-    private AntiGravityService antiGravityService;
+    private WorkloadTelemetryService workloadTelemetryService;
 
     @Value("${github.webhook.secret}")
     private String githubSecret;
@@ -37,7 +37,7 @@ public class TelemetryController {
         webhookEventRepository.save(event);
 
         CompletableFuture.runAsync(() -> {
-            antiGravityService.processPendingWebhooks();
+            workloadTelemetryService.processPendingWebhooks();
         });
 
         return ResponseEntity.ok("Webhook received and queued for processing");

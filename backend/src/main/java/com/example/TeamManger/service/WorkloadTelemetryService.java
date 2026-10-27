@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AntiGravityService {
+public class WorkloadTelemetryService {
 
     @Autowired
     private Userrepository userRepository;

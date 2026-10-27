@@ -10,6 +10,9 @@ public interface Userrepository extends JpaRepository<Users,Long>{
     public List<Users> findAllByEmail(String Email);
     public List<Users> findAllByUserName(String userName);
     Optional<Users> findByGithubLinkContaining(String githubUsername);
+    List<Users> findByCompanyPmIdOrId(Long companyPmId, Long id);
+    List<Users> findByCompanyPmId(Long companyPmId);
+    List<Users> findByTeamId(Long teamId);
 
     default Users findByEmail(String email) {
         if (email == null) return null;

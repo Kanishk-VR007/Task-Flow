@@ -131,6 +131,7 @@ public class Authcontroller {
             userdata.setRole(user.getRole());
             userdata.setId(user.getId());
             userdata.setAvatarConfig(user.getAvatarConfig());
+            userdata.setIsDefaultPassword(user.getIsDefaultPassword() != null ? user.getIsDefaultPassword() : false);
             userdata.setToken(obj2.gen_token(user.getEmail(), user.getRole()));
             return new ResponseEntity<>(userdata, HttpStatus.OK);
         } catch (Exception e) {
@@ -169,6 +170,7 @@ public class Authcontroller {
             userdata.setRole(user.getRole());
             userdata.setId(user.getId());
             userdata.setAvatarConfig(user.getAvatarConfig());
+            userdata.setIsDefaultPassword(user.getIsDefaultPassword() != null ? user.getIsDefaultPassword() : false);
             userdata.setToken(obj2.gen_token(user.getEmail(), user.getRole()));
             return new ResponseEntity<>(userdata, HttpStatus.OK);
         } catch (Exception e) {

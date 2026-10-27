@@ -21,6 +21,7 @@ public class Securityconfig {
         http
         .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
+        .headers(headers -> headers.frameOptions(frame -> frame.disable()))
         .authorizeHttpRequests(auth->
         auth
         .requestMatchers(
@@ -31,7 +32,8 @@ public class Securityconfig {
             "/auth/oauth-login",
             "/auth/drop-constraint",
             "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/v3/api-docs/**",
+            "/api/reports/files/**"
         ).permitAll()
         .anyRequest()
         .authenticated()

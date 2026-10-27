@@ -21,6 +21,14 @@ public class CommunicationService {
     @Autowired
     private com.example.TeamManger.repository.Taskrepository taskRepository;
 
+    private Users getCompanyForUser(Users u) {
+        if (u == null) return null;
+        if (u.getCompanyPm() != null) return u.getCompanyPm();
+        if (u.getRole() == Role.PROJECT_MANAGER) return u;
+        if (u.getTeam() != null && u.getTeam().getProjectManager() != null) return u.getTeam().getProjectManager();
+        return u;
+    }
+
     public void sendMessage(String username, ChannelType type, Long teamId, Long taskId, String content) {
         Users user = userRepository.findByUserName(username);
         if (user == null) {
@@ -30,6 +38,8 @@ public class CommunicationService {
         if (user == null) {
             throw new SecurityException("User not found");
         }
+
+        Users company = getCompanyForUser(user);
 
         if (type == ChannelType.LEAD_GLOBAL) {
             if (user.getRole() != Role.TEAM_LEAD && user.getRole() != Role.PROJECT_MANAGER && user.getRole() != Role.ADMIN) {
@@ -42,6 +52,10 @@ public class CommunicationService {
         } else if (type == ChannelType.TASK_COLLABORATION) {
             com.example.TeamManger.entity.Task task = taskRepository.findById(taskId).orElse(null);
             if (task == null) throw new SecurityException("Task not found");
+
+            if (task.getCompany() != null && company != null && !task.getCompany().getId().equals(company.getId())) {
+                throw new SecurityException("Unauthorized: Task belongs to a different company");
+            }
             
             boolean isAssigned = (task.getUser() != null && task.getUser().getId().equals(user.getId()));
             boolean isIntern = (task.getIntern() != null && task.getIntern().getId().equals(user.getId()));
@@ -55,6 +69,7 @@ public class CommunicationService {
 
         CommunicationLog log = new CommunicationLog();
         log.setSender(user);
+        log.setCompany(company);
         log.setChannelType(type);
         log.setTeamId(type == ChannelType.INTER_TEAM ? teamId : null);
         log.setTaskId(type == ChannelType.TASK_COLLABORATION ? taskId : null);

@@ -115,7 +115,7 @@ const AvatarCustomizer = ({ isOpen, onClose, onSave }) => {
     const faceSculpts = ['chiseled', 'soft', 'angular', 'cyber', 'rounded', 'sharp'];
     const outfits = ['techwear-hoodie', 'exec-blazer', 'dev-crewneck', 'spatial-suit', 'minimal-polo', 'lab-coat'];
     const pantsStyles = ['cargo-joggers', 'tailored-slacks', 'cyber-chinos', 'flight-trousers'];
-    const shoesList = ['cyber-runner', 'kinetic-high', 'minimalist-low', 'gravity-boots'];
+    const shoesList = ['cyber-runner', 'kinetic-high', 'minimalist-low', 'mag-boots'];
     const eyeweares = ['hud-visor', 'tech-frames', 'round-wire', 'monocle-hud', 'none'];
     const headweares = ['comm-headset', 'snapback', 'holo-beanie', 'vr-halo', 'none'];
     const neckwears = ['taskflow-lanyard', 'cyber-choker', 'titanium-chain', 'none'];
@@ -454,7 +454,7 @@ const AvatarCustomizer = ({ isOpen, onClose, onSave }) => {
                         { id: 'cyber-runner', label: 'Cyber Runner v4', desc: 'Luminescent air sole' },
                         { id: 'kinetic-high', label: 'Kinetic High-Top', desc: 'Mag-lock straps' },
                         { id: 'minimalist-low', label: 'Minimalist Low Mesh', desc: 'Carbon fiber' },
-                        { id: 'gravity-boots', label: 'Gravity Mag-Boots', desc: 'Suspension dampeners' }
+                        { id: 'mag-boots', label: 'Ion Mag-Boots', desc: 'Suspension dampeners' }
                       ].map(s => (
                         <button
                           key={s.id}

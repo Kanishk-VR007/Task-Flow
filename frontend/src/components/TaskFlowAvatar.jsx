@@ -123,7 +123,7 @@ export const rolePresets = {
     outfit: 'minimal-polo',
     clothingColor: '#842bd2',
     pantsStyle: 'cargo-joggers',
-    shoes: 'gravity-boots',
+    shoes: 'mag-boots',
     eyewear: 'none',
     headwear: 'snapback',
     neckwear: 'taskflow-lanyard',
@@ -535,7 +535,7 @@ const TaskFlowAvatar = ({
         {/* ================= 4. SNEAKERS & SHOES (Full body mode) ================= */}
         {isFullBody && (
           <g id="rig-shoes">
-            {config.shoes === 'gravity-boots' ? (
+            {config.shoes === 'mag-boots' ? (
               /* Heavy Armored Mag-Boots */
               <g>
                 <g transform="translate(140, 462)">

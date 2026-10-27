@@ -1,6 +1,7 @@
 package com.example.TeamManger.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.TeamManger.entity.Users;
@@ -17,6 +18,16 @@ public class TaskServiceimpl implements TaskService {
     Taskrepository obj;
     @Autowired
     Userrepository obj2;
+
+    private Users getCompanyForUser(Users u) {
+        if (u == null) return null;
+        if (u.getRole() == Role.PROJECT_MANAGER) return u;
+        if (u.getCompanyPm() != null) return u.getCompanyPm();
+        if (u.getTeam() != null && u.getTeam().getProjectManager() != null) {
+            return u.getTeam().getProjectManager();
+        }
+        return u;
+    }
 
     public Task SaveTask(Task data, String email) {
         Users currentUser = obj2.findByEmail(email);
@@ -52,6 +63,11 @@ public class TaskServiceimpl implements TaskService {
             }
             data.setIntern(intern);
         }
+
+        // Map task to the company
+        Users company = getCompanyForUser(currentUser);
+        data.setCompany(company);
+
         return obj.save(data);
     }
 
@@ -60,6 +76,13 @@ public class TaskServiceimpl implements TaskService {
         Users user = obj2.findByEmail(email);
         if (user == null)
             user = obj2.findByUserName(email);
+
+        if (user.getRole() != Role.ADMIN) {
+            Users userCompany = getCompanyForUser(user);
+            if (task.getCompany() != null && userCompany != null && !task.getCompany().getId().equals(userCompany.getId())) {
+                throw new SecurityException("Unauthorized access to task of another company");
+            }
+        }
 
         if (user.getRole() == Role.ADMIN || user.getRole() == Role.PROJECT_MANAGER) {
             return task;
@@ -96,34 +119,51 @@ public class TaskServiceimpl implements TaskService {
             return java.util.Collections.emptyList();
         }
 
-        if (user.getRole() == Role.ADMIN || user.getRole() == Role.PROJECT_MANAGER) {
+        if (user.getRole() == Role.ADMIN) {
             return obj.findAll();
         }
 
+        Users company = getCompanyForUser(user);
+        if (company == null) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Task> companyTasks = obj.findByCompanyId(company.getId());
+
+        if (user.getRole() == Role.PROJECT_MANAGER) {
+            return companyTasks;
+        }
+
         if (user.getRole() == Role.TEAM_LEAD) {
-            if (user.getTeam() == null)
-                return obj.findByUser(user);
-            return obj.findAll().stream()
+            if (user.getTeam() == null) {
+                return companyTasks.stream()
+                        .filter(task -> task.getUser() != null && task.getUser().getId().equals(user.getId()))
+                        .collect(Collectors.toList());
+            }
+            return companyTasks.stream()
                     .filter(task -> task.getUser() != null && task.getUser().getTeam() != null &&
                             task.getUser().getTeam().getId().equals(user.getTeam().getId()))
-                    .collect(java.util.stream.Collectors.toList());
+                    .collect(Collectors.toList());
         }
 
         if (user.getRole() == Role.INTERN) {
-            return obj.findAll().stream()
+            return companyTasks.stream()
                     .filter(task -> (task.getUser() != null && task.getUser().getId().equals(user.getId())) ||
                             (task.getIntern() != null && task.getIntern().getId().equals(user.getId())))
-                    .collect(java.util.stream.Collectors.toList());
+                    .collect(Collectors.toList());
         }
 
         if (user.getRole() == Role.DEVELOPER || user.getRole() == Role.JUNIOR_DEV) {
-            return obj.findAll().stream()
+            return companyTasks.stream()
                     .filter(task -> (task.getUser() != null && task.getUser().getId().equals(user.getId())) ||
-                            (task.getIntern() != null && task.getIntern().getSupervisor() != null && task.getIntern().getSupervisor().getId().equals(user.getId())))
-                    .collect(java.util.stream.Collectors.toList());
+                            (task.getIntern() != null && task.getIntern().getSupervisor() != null &&
+                                    task.getIntern().getSupervisor().getId().equals(user.getId())))
+                    .collect(Collectors.toList());
         }
 
-        return obj.findByUser(user);
+        return companyTasks.stream()
+                .filter(task -> task.getUser() != null && task.getUser().getId().equals(user.getId()))
+                .collect(Collectors.toList());
     }
 
     public Task UpdateTask(Long id, Task data, String email) {
@@ -166,9 +206,15 @@ public class TaskServiceimpl implements TaskService {
             }
             task.setIntern(intern);
         } else if (data.getIntern() == null) {
-            // Allow unassigning intern
             task.setIntern(null);
         }
+
+        if (task.getCompany() == null) {
+            Users currentUser = obj2.findByEmail(email);
+            if (currentUser == null) currentUser = obj2.findByUserName(email);
+            task.setCompany(getCompanyForUser(currentUser));
+        }
+
         return obj.save(task);
     }
 

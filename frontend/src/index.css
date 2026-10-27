@@ -423,18 +423,18 @@
 .nebula-glow { animation: nebulaDrift 22s infinite ease-in-out alternate; }
 .rocket-flame-glow { animation: flameFlicker 0.25s infinite ease-in-out; }
 
-/* Anti-Gravity UI Effects */
-.anti-gravity-card {
+/* Interactive Card & Glow UI Effects */
+.taskflow-card {
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   transform-style: preserve-3d;
 }
-.anti-gravity-card:hover {
+.taskflow-card:hover {
   transform: translateY(-4px) rotateX(2deg) rotateY(-1deg);
   box-shadow: 0 12px 40px -8px rgba(77, 142, 255, 0.2), 0 0 20px rgba(77, 142, 255, 0.1);
   border-color: rgba(77, 142, 255, 0.3);
 }
 
-.anti-gravity-glow:hover {
+.taskflow-glow:hover {
   filter: drop-shadow(0 0 15px rgba(77, 142, 255, 0.4));
 }
 

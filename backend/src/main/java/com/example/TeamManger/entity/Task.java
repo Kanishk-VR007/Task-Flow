@@ -46,6 +46,10 @@ public class Task {
     @JoinColumn(name="intern_id")
     private Users intern;
 
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Users company;
+
     public Long getId(){
         return id;
     }
@@ -71,6 +75,8 @@ public class Task {
     public void setProject(Project project) { this.project = project; }
     public Users getIntern() { return intern; }
     public void setIntern(Users intern) { this.intern = intern; }
+    public Users getCompany() { return company; }
+    public void setCompany(Users company) { this.company = company; }
     public LocalDateTime getStartTime() {
         return startTime;
     }

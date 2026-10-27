@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.TeamManger.dto.RegisterRequestDto;
 import com.example.TeamManger.entity.Users;
+import com.example.TeamManger.entity.Role;
 import com.example.TeamManger.repository.Userrepository;
 import com.example.TeamManger.service.UserService;
 import com.example.TeamManger.util.HashUtil;
@@ -28,10 +29,16 @@ public Boolean checkpassword(Users data){
         user.setEmail(data.getEmail());
         user.setFpassword(HashUtil.hashSHA256(data.getFirstPassword()));
         user.setCpassword(HashUtil.hashSHA256(data.getConfirmPassword()));
-        user.setRole(data.getRole());
+        user.setRole(data.getRole() != null ? data.getRole() : Role.PROJECT_MANAGER);
         user.setUserName(data.getName());
-        obj.save(user);
-         return "Sucessfully Registered";
+        user.setFullName(data.getName());
+        user.setIsDefaultPassword(false);
+        user = obj.save(user);
+        if (user.getRole() == Role.PROJECT_MANAGER) {
+            user.setCompanyPm(user);
+            obj.save(user);
+        }
+        return "Sucessfully Registered";
  }
  public Users getUser(Long id){
     return obj.findById(id).orElseThrow(()->new RuntimeException("No User Found"));

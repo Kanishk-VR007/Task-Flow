@@ -105,7 +105,7 @@ const Analytics = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="anti-gravity-card bg-surface-container-high/95 backdrop-blur-xl p-4 rounded-xl border border-outline-variant/20 shadow-2xl">
+        <div className="taskflow-card bg-surface-container-high/95 backdrop-blur-xl p-4 rounded-xl border border-outline-variant/20 shadow-2xl">
           <p className="font-bold text-on-surface mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm my-1" style={{ opacity: hoveredLine && hoveredLine !== entry.dataKey ? 0.3 : 1 }}>
@@ -145,7 +145,7 @@ const Analytics = () => {
           { label: 'Avg Time', value: '18h', icon: 'schedule', color: 'text-sky-400', bg: 'bg-sky-500/10' },
           { label: 'Win Rate', value: `${tasks.length ? Math.round((statusCounts.COMPLETED / tasks.length) * 100) : 0}%`, icon: 'speed', color: 'text-violet-400', bg: 'bg-violet-500/10' },
         ].map((kpi, i) => (
-          <div key={i} className="anti-gravity-card rounded-xl bg-surface-container/60 p-space-md backdrop-blur-md border border-outline-variant/10 flex flex-col justify-between">
+          <div key={i} className="taskflow-card rounded-xl bg-surface-container/60 p-space-md backdrop-blur-md border border-outline-variant/10 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-2">
               <span className="font-label-sm text-[11px] uppercase tracking-wider font-semibold text-on-surface-variant">{kpi.label}</span>
               <div className={`w-8 h-8 rounded-lg ${kpi.bg} ${kpi.color} flex items-center justify-center`}>
@@ -159,7 +159,7 @@ const Analytics = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
         {/* Performance Trends Chart */}
-        <div className="anti-gravity-card lg:col-span-2 rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10">
+        <div className="taskflow-card lg:col-span-2 rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10">
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-space-lg">Productivity Trend</h2>
           <div className="w-full h-80 relative">
             <ResponsiveContainer width="100%" height="100%">
@@ -193,7 +193,7 @@ const Analytics = () => {
         </div>
 
         {/* Domain Distribution */}
-        <div className="anti-gravity-card rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10 flex flex-col">
+        <div className="taskflow-card rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10 flex flex-col">
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">Domain Distribution</h2>
           <div className="flex-1 w-full relative min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -211,7 +211,7 @@ const Analytics = () => {
         </div>
 
         {/* Developer Leaderboard & Metrics */}
-        <div className="anti-gravity-card lg:col-span-3 rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10 relative overflow-hidden">
+        <div className="taskflow-card lg:col-span-3 rounded-2xl bg-surface-container/60 p-space-xl backdrop-blur-md border border-outline-variant/10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-tertiary/5 rounded-full blur-3xl pointer-events-none"></div>
           
@@ -230,7 +230,7 @@ const Analytics = () => {
               const currentProg = user.currentProgress || 0;
 
               return (
-                <div key={user.id} className="anti-gravity-card group relative bg-surface-container-low/40 border border-outline-variant/10 rounded-2xl p-space-md overflow-hidden backdrop-blur-sm">
+                <div key={user.id} className="taskflow-card group relative bg-surface-container-low/40 border border-outline-variant/10 rounded-2xl p-space-md overflow-hidden backdrop-blur-sm">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                   
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md relative z-10">

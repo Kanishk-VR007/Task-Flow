@@ -162,7 +162,7 @@ const Tasks = () => {
             
             return (
               <div key={task.id}
-                className="anti-gravity-card group rounded-2xl bg-surface-container/60 p-space-lg backdrop-blur-md border border-outline-variant/10 flex flex-col gap-4">
+                className="taskflow-card group rounded-2xl bg-surface-container/60 p-space-lg backdrop-blur-md border border-outline-variant/10 flex flex-col gap-4">
                 
                 {/* Header */}
                 <div className="flex justify-between items-start">
@@ -225,7 +225,7 @@ const Tasks = () => {
                     <span className="text-primary group-hover/progress:text-primary transition-colors">{progress}%</span>
                   </div>
                   <div className="w-full h-2.5 bg-surface-container-highest rounded-full overflow-hidden shadow-inner relative">
-                    <div className="h-full bg-gradient-to-r from-primary to-tertiary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(77,142,255,0.6)] anti-gravity-glow" style={{ width: `${progress}%` }}></div>
+                    <div className="h-full bg-gradient-to-r from-primary to-tertiary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(77,142,255,0.6)] taskflow-glow" style={{ width: `${progress}%` }}></div>
                   </div>
                   <div className="flex justify-between mt-2 text-[10px] text-on-surface-variant font-medium">
                     <span>Est: {estHours}h</span>

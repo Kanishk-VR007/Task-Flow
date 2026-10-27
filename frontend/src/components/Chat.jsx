@@ -199,7 +199,7 @@ const Chat = () => {
                 const senderRole = msg.sender?.role || 'USER';
                 const isMe = msg.sender?.id === user.id || msg.sender?.email === user.email || senderName === user.name || senderName === user.email;
                 return (
-                  <div key={msg.id || i} className={`anti-gravity-card flex gap-3 max-w-[80%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'} transition-transform hover:-translate-y-1`}>
+                  <div key={msg.id || i} className={`taskflow-card flex gap-3 max-w-[80%] ${isMe ? 'self-end flex-row-reverse' : 'self-start'} transition-transform hover:-translate-y-1`}>
                     <TaskFlowAvatar user={msg.sender || {name: senderName}} size="small" className="w-8 h-8 mt-1 flex-shrink-0" />
                     <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       <span className="text-xs text-on-surface-variant mb-1 flex items-center gap-2 px-1">

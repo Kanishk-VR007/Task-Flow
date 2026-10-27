@@ -27,11 +27,7 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeding mock data for TaskFlow...");
 
         // 1. Create Teams
-        Team team1 = new Team(); team1.setTeamName("Team 1");
-        Team team2 = new Team(); team2.setTeamName("Team 2");
-        teamRepository.saveAll(Arrays.asList(team1, team2));
-
-        // 2. Create Project Manager
+        // 1. Create Project Manager
         Users pm = new Users();
         pm.setFullName("Priya Sharma");
         pm.setUserName("Priya");
@@ -39,7 +35,14 @@ public class DataSeeder implements CommandLineRunner {
         pm.setRole(Role.PROJECT_MANAGER);
         pm.setFpassword(com.example.TeamManger.util.HashUtil.hashSHA256("password"));
         pm.setCpassword(com.example.TeamManger.util.HashUtil.hashSHA256("password"));
+        pm = userRepository.save(pm);
+        pm.setCompanyPm(pm);
         userRepository.save(pm);
+
+        // 2. Create Teams
+        Team team1 = new Team(); team1.setTeamName("Team 1"); team1.setProjectManager(pm);
+        Team team2 = new Team(); team2.setTeamName("Team 2"); team2.setProjectManager(pm);
+        teamRepository.saveAll(Arrays.asList(team1, team2));
 
         // 3. Create Team 1 Lead and Members
         Users lead1 = createMember("Arun Kumar", "Arun", "arun@taskflow.com", Role.TEAM_LEAD, team1, "BACKEND", "");
@@ -101,6 +104,7 @@ public class DataSeeder implements CommandLineRunner {
             t.setEndTime(LocalDateTime.now().plusDays(i % 10));
             t.setUser(allUsers.get(i % allUsers.size()));
             t.setProject(i % 2 == 0 ? p1 : p2);
+            t.setCompany(pm);
             taskRepository.save(t);
         }
 
@@ -116,6 +120,9 @@ public class DataSeeder implements CommandLineRunner {
         u.setTeam(team);
         u.setPrimaryDomain(primaryDomain);
         u.setSecondaryDomains(secondaryDomains);
+        if (team != null && team.getProjectManager() != null) {
+            u.setCompanyPm(team.getProjectManager());
+        }
         u.setFpassword(com.example.TeamManger.util.HashUtil.hashSHA256("password"));
         u.setCpassword(com.example.TeamManger.util.HashUtil.hashSHA256("password"));
         return userRepository.save(u);

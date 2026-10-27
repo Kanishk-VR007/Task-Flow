@@ -156,7 +156,7 @@ const Calendar = () => {
       </div>
 
       {/* Filter Panel */}
-      <div className="anti-gravity-card bg-surface-container/60 rounded-xl p-space-md backdrop-blur-md border border-outline-variant/10 flex flex-wrap gap-4 items-center z-20 relative">
+      <div className="taskflow-card bg-surface-container/60 rounded-xl p-space-md backdrop-blur-md border border-outline-variant/10 flex flex-wrap gap-4 items-center z-20 relative">
         <span className="material-symbols-outlined text-on-surface-variant">filter_list</span>
         
         <select value={filterTime} onChange={e => setFilterTime(e.target.value)} className="bg-surface-container-high border border-outline-variant/20 rounded-lg px-3 py-1.5 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary">

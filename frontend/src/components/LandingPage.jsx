@@ -509,7 +509,7 @@ const LandingPage = () => {
       </p>
 </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
 
 <div className="glass-panel-subtle rounded-2xl p-7 border border-white/10 hover:border-cyan-400/50 transition-all duration-300 group flex flex-col justify-between hover:-translate-y-1">
 <div>
@@ -566,44 +566,6 @@ const LandingPage = () => {
 <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
 <span className="text-slate-400">Integrations</span>
 <span className="font-bold text-indigo-300">45+ Native Connectors</span>
-</div>
-</div>
-
-<div className="glass-panel-subtle rounded-2xl p-7 border border-white/10 hover:border-emerald-400/50 transition-all duration-300 group flex flex-col justify-between hover:-translate-y-1">
-<div>
-<div className="flex items-center justify-between mb-5">
-<div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg shadow-md shadow-emerald-500/30">
-<i className="fa-solid fa-brain"></i>
-</div>
-<span className="text-[10px] font-mono text-emerald-300 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/20">Predictive AI</span>
-</div>
-<h3 className="text-xl font-bold text-white mb-2.5">Predictive BI &amp; Analytics</h3>
-<p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
-            Real-time burndown analytics, deployment frequency telemetry, pull-request queue hygiene, and AI-driven sprint capacity estimation.
-          </p>
-</div>
-<div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-<span className="text-slate-400">Velocity Forecast</span>
-<span className="font-bold text-emerald-300">99.1% Confidence</span>
-</div>
-</div>
-
-<div className="glass-panel-subtle rounded-2xl p-7 border border-white/10 hover:border-blue-400/50 transition-all duration-300 group flex flex-col justify-between hover:-translate-y-1">
-<div>
-<div className="flex items-center justify-between mb-5">
-<div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center text-white text-lg shadow-md shadow-blue-500/30">
-<i className="fa-solid fa-shield-halved"></i>
-</div>
-<span className="text-[10px] font-mono text-blue-300 bg-blue-400/10 px-2 py-0.5 rounded-full border border-blue-400/20">SOC 2 Type II</span>
-</div>
-<h3 className="text-xl font-bold text-white mb-2.5">Enterprise RBAC &amp; Security</h3>
-<p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
-            Granular 6-role hierarchy, complete immutable audit logging, SAML 2.0 / Okta SSO, custom data residency, and end-to-end encryption.
-          </p>
-</div>
-<div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-<span className="text-slate-400">Security Standard</span>
-<span className="font-bold text-blue-300">ISO 27001 &amp; HIPAA</span>
 </div>
 </div>
 

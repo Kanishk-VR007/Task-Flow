@@ -30,15 +30,32 @@ public class DashboardController {
             String email = SecurityContextHolder.getContext().getAuthentication().getName();
             Users user = userRepository.findByEmail(email);
             if (user == null) user = userRepository.findByUserName(email);
+            if (user == null) return ResponseEntity.status(401).body("Unauthorized");
 
-            var allTasks = taskRepository.findAll();
-            
+            Long companyId = user.getRole() == Role.PROJECT_MANAGER
+                    ? user.getId()
+                    : (user.getCompanyPm() != null ? user.getCompanyPm().getId()
+                    : (user.getTeam() != null && user.getTeam().getProjectManager() != null ? user.getTeam().getProjectManager().getId() : null));
+
+            List<com.example.TeamManger.entity.Task> allTasks;
+            long totalUsers;
+
+            if (user.getRole() == Role.ADMIN) {
+                allTasks = taskRepository.findAll();
+                totalUsers = userRepository.count();
+            } else if (companyId != null) {
+                allTasks = taskRepository.findByCompanyId(companyId);
+                totalUsers = userRepository.findByCompanyPmIdOrId(companyId, companyId).size();
+            } else {
+                allTasks = Collections.emptyList();
+                totalUsers = 1;
+            }
+
             long totalTasks = allTasks.size();
             long completed = allTasks.stream().filter(t -> "COMPLETED".equalsIgnoreCase(t.getCompletionStatus())).count();
             long inProgress = allTasks.stream().filter(t -> "IN_PROGRESS".equalsIgnoreCase(t.getCompletionStatus())).count();
             long pending = allTasks.stream().filter(t -> "PENDING".equalsIgnoreCase(t.getCompletionStatus())).count();
             long overdue = allTasks.stream().filter(t -> t.getEndTime() != null && t.getEndTime().isBefore(java.time.LocalDateTime.now()) && !"COMPLETED".equalsIgnoreCase(t.getCompletionStatus())).count();
-            long totalUsers = userRepository.count();
 
             Map<String, Object> stats = new HashMap<>();
             stats.put("totalTasks", totalTasks);

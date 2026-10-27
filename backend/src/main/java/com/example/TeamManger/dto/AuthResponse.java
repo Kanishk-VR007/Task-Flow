@@ -12,6 +12,14 @@ public class AuthResponse {
     private Role role;
     private String token;
     private String avatarConfig;
+    private Boolean isDefaultPassword = false;
+
+    public Boolean getIsDefaultPassword() {
+        return isDefaultPassword != null ? isDefaultPassword : false;
+    }
+    public void setIsDefaultPassword(Boolean isDefaultPassword) {
+        this.isDefaultPassword = isDefaultPassword;
+    }
 
     public Long getId() {
         return id;

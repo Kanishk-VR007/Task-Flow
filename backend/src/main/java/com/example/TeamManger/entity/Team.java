@@ -9,7 +9,7 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String teamName;
 
     private String domain;
@@ -17,6 +17,11 @@ public class Team {
     @ManyToOne
     @JoinColumn(name = "team_lead_id")
     private Users teamLead;
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_manager_id")
+    private Users projectManager;
 
     @OneToMany(mappedBy = "team")
     private List<Users> members;
@@ -27,6 +32,13 @@ public class Team {
         this.teamName = teamName;
         this.domain = domain;
         this.teamLead = teamLead;
+    }
+
+    public Team(String teamName, String domain, Users teamLead, Users projectManager) {
+        this.teamName = teamName;
+        this.domain = domain;
+        this.teamLead = teamLead;
+        this.projectManager = projectManager;
     }
 
     public Long getId() {
@@ -59,6 +71,14 @@ public class Team {
 
     public void setTeamLead(Users teamLead) {
         this.teamLead = teamLead;
+    }
+
+    public Users getProjectManager() {
+        return projectManager;
+    }
+
+    public void setProjectManager(Users projectManager) {
+        this.projectManager = projectManager;
     }
 
     public List<Users> getMembers() {

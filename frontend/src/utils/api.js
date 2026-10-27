@@ -82,7 +82,31 @@ export const api = {
     const text = await res.text();
     try { return JSON.parse(text); } catch { return text; }
   },
+
+  async upload(path, formData) {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+      throw new Error('Unauthorized');
+    }
+    if (res.status === 403) {
+      throw new Error('Forbidden: You do not have permission to access this resource.');
+    }
+    if (!res.ok) throw new Error(await res.text());
+    const text = await res.text();
+    try { return JSON.parse(text); } catch { return text; }
+  },
 };
+
+export { API_BASE };
 
 export function getUser() {
   try {

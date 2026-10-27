@@ -95,11 +95,21 @@ public class Taskcontroler {
     public ResponseEntity<?> getSuggestions(@PathVariable String domain) {
         try {
             String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            com.example.TeamManger.entity.Users currentUser = userRepo.findAll().stream()
-                    .filter(u -> currentUserEmail.equals(u.getEmail()))
-                    .findFirst().orElse(null);
+            com.example.TeamManger.entity.Users foundUser = userRepo.findByEmail(currentUserEmail);
+            if (foundUser == null) foundUser = userRepo.findByUserName(currentUserEmail);
+            if (foundUser == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+            final com.example.TeamManger.entity.Users currentUser = foundUser;
 
-            java.util.List<com.example.TeamManger.entity.Users> developers = userRepo.findAll().stream()
+            com.example.TeamManger.entity.Users company = currentUser.getRole() == com.example.TeamManger.entity.Role.PROJECT_MANAGER
+                    ? currentUser
+                    : (currentUser.getCompanyPm() != null ? currentUser.getCompanyPm()
+                    : (currentUser.getTeam() != null && currentUser.getTeam().getProjectManager() != null ? currentUser.getTeam().getProjectManager() : null));
+
+            java.util.List<com.example.TeamManger.entity.Users> userPool = company != null
+                    ? userRepo.findByCompanyPmIdOrId(company.getId(), company.getId())
+                    : userRepo.findAll();
+
+            java.util.List<com.example.TeamManger.entity.Users> developers = userPool.stream()
                     .filter(u -> u.getRole() == com.example.TeamManger.entity.Role.DEVELOPER
                             || u.getRole() == com.example.TeamManger.entity.Role.JUNIOR_DEV
                             || u.getRole() == com.example.TeamManger.entity.Role.INTERN)

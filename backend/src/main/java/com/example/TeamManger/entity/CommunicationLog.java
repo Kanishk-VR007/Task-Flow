@@ -20,6 +20,10 @@ public class CommunicationLog {
     @ManyToOne
     private Users sender;
 
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(name = "company_id")
+    private Users company;
+
     @Enumerated(EnumType.STRING)
     private ChannelType channelType;
 
@@ -94,5 +98,13 @@ public class CommunicationLog {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Users getCompany() {
+        return company;
+    }
+
+    public void setCompany(Users company) {
+        this.company = company;
     }
 }
